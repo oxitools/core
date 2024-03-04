@@ -15,6 +15,7 @@ import {
   isError,
   isFunction,
   isInstanceOf,
+  isIterable,
   isMap,
   isNil,
   isNull,
@@ -462,6 +463,47 @@ Deno.test("isRegExp identifies RegExps correctly", () => {
   assertFalse(
     isRegExp(new Set()),
     "Expected a Set not to be recognized as a RegExp",
+  );
+});
+
+Deno.test("isIterable identifies iterables correctly", () => {
+  // Iterable cases
+  assert(isIterable([]), "Expected an array to be recognized as iterable");
+  assert(isIterable(new Map()), "Expected a Map to be recognized as iterable");
+  assert(isIterable(new Set()), "Expected a Set to be recognized as iterable");
+  assert(
+    isIterable("string"),
+    "Expected a string to be recognized as iterable",
+  );
+  assert(
+    isIterable((function* () {})()),
+    "Expected a generator function to be recognized as iterable",
+  );
+
+  // Non-iterable cases
+  assertFalse(
+    isIterable({}),
+    "Expected a plain object not to be recognized as iterable",
+  );
+  assertFalse(
+    isIterable(123),
+    "Expected a number not to be recognized as iterable",
+  );
+  assertFalse(
+    isIterable(true),
+    "Expected a boolean not to be recognized as iterable",
+  );
+  assertFalse(
+    isIterable(null),
+    "Expected null not to be recognized as iterable",
+  );
+  assertFalse(
+    isIterable(undefined),
+    "Expected undefined not to be recognized as iterable",
+  );
+  assertFalse(
+    isIterable(() => {}),
+    "Expected a regular function not to be recognized as iterable",
   );
 });
 

@@ -383,6 +383,36 @@ export function isRegExp(value: unknown): value is RegExp {
 }
 
 /**
+ * Checks if the provided value is iterable, meaning it implements the iterable protocol.
+ * This is determined by checking if the value is defined (not `null` or `undefined`),
+ * has a `[Symbol.iterator]` property, and that property is a function.
+ *
+ * This function can be used to ensure that a value can be used in a `for...of` loop or
+ * with the spread operator, among other iterable-compatible operations.
+ *
+ * @param value - The value to be checked for iterability.
+ * @returns `true` if the value is iterable, otherwise `false`.
+ *
+ * @example
+ * ```ts
+ * isIterable([1, 2, 3]); // true, arrays are iterable
+ * isIterable(new Map()); // true, maps are iterable
+ * isIterable(new Set()); // true, sets are iterable
+ * isIterable('string'); // true, strings are iterable
+ * isIterable({}); // false, plain objects are not iterable
+ * isIterable(null); // false, null is not iterable
+ * isIterable(undefined); // false, undefined is not iterable
+ * ```
+ */
+export function isIterable(value: unknown): value is Iterable<unknown> {
+  if (value == null) return false; // Immediately return false for null and undefined
+
+  // Attempt to access the Symbol.iterator property in a way that works for both objects and primitives
+  const valueAsObject = typeof value === "object" ? value : Object(value);
+  return typeof valueAsObject[Symbol.iterator] === "function";
+}
+
+/**
  * Checks if a value is neither `null` nor `undefined`, effectively ensuring that the value is defined.
  * This type-guard function leverages the `isNil` utility to provide a type-safe way of filtering out `null` and `undefined` values,
  * allowing TypeScript to infer a more specific type for the value within a conditional block.
