@@ -1,4 +1,48 @@
 /**
+ * Utility Functions Module
+ * ========================
+ *
+ * Overview
+ * --------
+ * This module provides a collection of TypeScript utility functions designed to enhance type checking and validation in your applications. These utilities extend the basic capabilities of TypeScript's type system, allowing for more precise runtime type assertions and data manipulation.
+ *
+ * Utilities Included:
+ * - `assert(condition: any, message?: string, options?: ErrorOptions): asserts condition`:
+ *   Asserts that a condition is truthy, throwing an error with an optional message and options if not.
+ *
+ * - `isDefined<T>(value: T): value is NonNullable<T>`:
+ *   Checks if a value is neither null nor undefined, ensuring it is defined.
+ *
+ * - `isIterable(value: unknown): value is Iterable<unknown>`:
+ *   Determines whether a value is iterable, supporting checks for arrays, strings, Maps, Sets, and other iterable objects.
+ *
+ * - `getTypeOf(value: unknown): string`:
+ *   Returns the type of the given value as a lowercase string, handling a wide range of JavaScript types and edge cases.
+ *
+ * - Type-checking utilities:
+ *   A suite of functions like `isString`, `isNumber`, `isBoolean`, `isBigInt`, `isSymbol`, `isObject`, `isArray`, `isPlainObject`, `isFunction`, `isPromise`, `isDate`, `isError`, `isMap`, `isSet`, and `isRegExp` to validate various JavaScript types.
+ *
+ * Usage
+ * -----
+ * Import the utilities as needed into your TypeScript files to perform runtime checks, validate data, or assert conditions. These utilities are especially useful in scenarios where TypeScript's compile-time type system isn't sufficient, such as when dealing with data from external sources or user input.
+ *
+ * Example:
+ * ```ts
+ * import { assert, isString, getTypeOf } from '@oxi/core';
+ *
+ * const data: unknown = fetchDataFromAPI();
+ *
+ * assert(isString(data), 'Data must be a string');
+ * console.log(`Data is of type: ${getTypeOf(data)}`);
+ * ```
+ *
+ * Notes
+ * -----
+ * While these utilities enhance runtime type safety and data validation, they complement rather than replace TypeScript's compile-time type checks. Use them judiciously to avoid redundant checks or impacting performance.
+ * @module
+ */
+
+/**
  * Checks if a value is an instance of a specific class or constructor function.
  * This is a generic type-guard that can be used with any class or constructor function.
  *
@@ -31,7 +75,7 @@
 export function isInstanceOf<T>(
   value: unknown,
   // deno-lint-ignore no-explicit-any
-  constructor: new (...args: any[]) => T,
+  constructor: new (...args: any[]) => T
 ): value is T {
   return value instanceof constructor;
 }
@@ -203,7 +247,7 @@ export function isArray(value: unknown): value is unknown[] {
  * ```
  */
 export function isPlainObject(
-  value: unknown,
+  value: unknown
 ): value is { [key: PropertyKey]: unknown } {
   // Directly check for null or undefined
   if (value == null) {
@@ -452,7 +496,7 @@ export function assert(
   // deno-lint-ignore no-explicit-any
   condition: any,
   message = "Assertion failed",
-  options?: ErrorOptions,
+  options?: ErrorOptions
 ): asserts condition {
   condition || raise(message, options);
 }
