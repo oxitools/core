@@ -75,7 +75,7 @@
 export function isInstanceOf<T>(
   value: unknown,
   // deno-lint-ignore no-explicit-any
-  constructor: new (...args: any[]) => T
+  constructor: new (...args: any[]) => T,
 ): value is T {
   return value instanceof constructor;
 }
@@ -247,7 +247,7 @@ export function isArray(value: unknown): value is unknown[] {
  * ```
  */
 export function isPlainObject(
-  value: unknown
+  value: unknown,
 ): value is { [key: PropertyKey]: unknown } {
   // Directly check for null or undefined
   if (value == null) {
@@ -496,7 +496,7 @@ export function assert(
   // deno-lint-ignore no-explicit-any
   condition: any,
   message = "Assertion failed",
-  options?: ErrorOptions
+  options?: ErrorOptions,
 ): asserts condition {
   condition || raise(message, options);
 }
@@ -616,4 +616,60 @@ export function getTypeOf(value: unknown): string {
 
   // Fallback for any exotic or unknown types
   return "unknown";
+}
+
+type PlainObject = { [key: PropertyKey]: unknown };
+
+// deno-lint-ignore ban-types
+type Pretty<T> = { [K in keyof T]: T[K] } & {};
+
+/**
+ * Creates an object composed of the picked object properties.
+ *
+ * @template T - The type of the source object.
+ * @template K - The keys of the properties to pick.
+ * @param {T} src - The source object.
+ * @param {readonly K[]} keys - The property keys to pick from the source object.
+ * @returns {Pretty<Pick<T, K>>} A new object with only the picked properties.
+ *
+ * @example
+ * ```typescript
+ * const person = { name: 'John', age: 30, job: 'Developer' };
+ * const picked = pick(person, ['name', 'job']);
+ * console.log(picked); // Output: { name: 'John', job: 'Developer' }
+ * ```
+ */
+export function pick<T extends PlainObject, K extends keyof T>(
+  src: T,
+  keys: readonly K[],
+): Pretty<Pick<T, K>> {
+  const dest = Object.create(null);
+  for (const key of keys) {
+    dest[key] = src[key];
+  }
+  return dest;
+}
+
+/**
+ * Creates an object composed of the object properties not omitted.
+ *
+ * @template T - The type of the source object.
+ * @template K - The keys of the properties to omit.
+ * @param {T} src - The source object.
+ * @param {readonly K[]} keys - The property keys to omit from the source object.
+ * @returns {Pretty<Omit<T, K>>} A new object with the properties not omitted.
+ *
+ * @example
+ * ```typescript
+ * const person = { name: 'Jane', age: 25, job: 'Designer' };
+ * const omitted = omit(person, ['age']);
+ * console.log(omitted); // Output: { name: 'Jane', job: 'Designer' }
+ * ```
+ */
+export function omit<T extends PlainObject, K extends keyof T>(
+  src: T,
+  keys: readonly K[],
+): Pretty<Omit<T, K>> {
+  const filtered = Object.keys(src).filter((key) => !keys.includes(key as K));
+  return pick(src, filtered) as Omit<T, K>;
 }

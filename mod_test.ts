@@ -28,6 +28,8 @@ import {
   isString,
   isSymbol,
   isUndefined,
+  omit,
+  pick,
   raise,
 } from "./mod.ts";
 
@@ -650,3 +652,47 @@ Deno.test("getTypeOf returns correct types", () => {
     'Expected "object" for custom class instances',
   );
 });
+
+// Test for the `pick` function
+Deno.test("pick: should pick specified properties from an object", () => {
+  const obj = { name: "John", age: 30, job: "Developer" };
+  const result = pick(obj, ["name", "job"]);
+  const expected = { name: "John", job: "Developer" };
+
+  // Use Deno's built-in assertion functions to verify the result.
+  assertEquals(result, expected);
+});
+
+// Test for the `omit` function
+Deno.test("omit: should omit specified properties from an object", () => {
+  const obj = { name: "Jane", age: 25, job: "Designer" };
+  const result = omit(obj, ["age"]);
+  const expected = { name: "Jane", job: "Designer" };
+
+  // Use Deno's built-in assertion functions to verify the result.
+  assertEquals(result, expected);
+});
+
+// Additional test to check if `pick` works with empty keys array
+Deno.test(
+  "pick: should return an empty object when keys array is empty",
+  () => {
+    const obj = { name: "Alice", age: 28, job: "Engineer" };
+    const result = pick(obj, []);
+    const expected = {};
+
+    assertEquals(result, expected);
+  },
+);
+
+// Additional test to check if `omit` works with empty keys array
+Deno.test(
+  "omit: should return the same object when keys array is empty",
+  () => {
+    const obj = { name: "Bob", age: 32, job: "Artist" };
+    const result = omit(obj, []);
+    const expected = { name: "Bob", age: 32, job: "Artist" };
+
+    assertEquals(result, expected);
+  },
+);
