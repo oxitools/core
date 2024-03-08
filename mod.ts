@@ -618,7 +618,7 @@ export function getTypeOf(value: unknown): string {
   return "unknown";
 }
 
-type PlainObject = { [key: PropertyKey]: unknown };
+type PlainObject = { [key: string]: unknown };
 
 // deno-lint-ignore ban-types
 type Pretty<T> = { [K in keyof T]: T[K] } & {};
