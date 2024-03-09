@@ -618,8 +618,6 @@ export function getTypeOf(value: unknown): string {
   return "unknown";
 }
 
-type PlainObject = { [key: string]: unknown };
-
 // deno-lint-ignore ban-types
 type Pretty<T> = { [K in keyof T]: T[K] } & {};
 
@@ -639,15 +637,26 @@ type Pretty<T> = { [K in keyof T]: T[K] } & {};
  * console.log(picked); // Output: { name: 'John', job: 'Developer' }
  * ```
  */
-export function pick<T extends PlainObject, K extends keyof T>(
+export function pick<T, K extends keyof T>(
   src: T,
-  keys: readonly K[],
+  keys: (K | symbol)[],
 ): Pretty<Pick<T, K>> {
-  const dest = Object.create(null);
-  for (const key of keys) {
-    dest[key] = src[key];
+  // Ensure the function is used with plain objects
+  if (typeof src !== "object" || src === null) {
+    throw new Error("The source must be a non-null object");
   }
-  return dest;
+
+  // Create a new object with the same prototype as the source
+  const dest = Object.create(Object.getPrototypeOf(src));
+
+  // Copy specified properties to the new object
+  keys.forEach((key) => {
+    if (key in src) {
+      Reflect.set(dest, key, Reflect.get(src, key));
+    }
+  });
+
+  return dest as Pick<T, K>;
 }
 
 /**
@@ -666,10 +675,27 @@ export function pick<T extends PlainObject, K extends keyof T>(
  * console.log(omitted); // Output: { name: 'Jane', job: 'Designer' }
  * ```
  */
-export function omit<T extends PlainObject, K extends keyof T>(
+export function omit<T, K extends keyof T>(
   src: T,
-  keys: readonly K[],
+  keys: (K | symbol)[],
 ): Pretty<Omit<T, K>> {
-  const filtered = Object.keys(src).filter((key) => !keys.includes(key as K));
-  return pick(src, filtered) as Omit<T, K>;
+  // Ensure the function is used with plain objects
+  if (typeof src !== "object" || src === null) {
+    throw new Error("The source must be a non-null object");
+  }
+
+  // Convert keys to a Set for efficient lookup
+  const keysToOmit = new Set(keys);
+
+  // Create a new object with the same prototype as the source
+  const dest = Object.create(Object.getPrototypeOf(src));
+
+  // Copy properties that are not in the keysToOmit set
+  Reflect.ownKeys(src).forEach((key) => {
+    if (!keysToOmit.has(key as K | symbol)) {
+      Reflect.set(dest, key, Reflect.get(src, key));
+    }
+  });
+
+  return dest as Omit<T, K>;
 }
