@@ -578,7 +578,7 @@ export function getTypeOf(value: unknown): string {
   // Handle primitive types (string, number, boolean, undefined, symbol, bigint)
   const type = typeof value;
   if (type !== "object" && type !== "function") {
-    // handle NaN (all NaNs are numbers)
+    // Handle NaN (all NaNs are numbers)
     if (type === "number" && isNaN(value)) {
       return "nan";
     }
