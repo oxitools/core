@@ -570,6 +570,11 @@ export function getTypeOf(value: unknown): string {
     return "null";
   }
 
+  // Handle NaN (Note: NaN is the only value in JavaScript which is not equal to itself)
+  if (value !== value) {
+    return "nan";
+  }
+
   // Handle Infinity (both positive and negative)
   if (value === Infinity || value === -Infinity) {
     return "infinity";
@@ -578,10 +583,6 @@ export function getTypeOf(value: unknown): string {
   // Handle primitive types (string, number, boolean, undefined, symbol, bigint)
   const type = typeof value;
   if (type !== "object" && type !== "function") {
-    // Handle NaN (all NaNs are numbers)
-    if (type === "number" && isNaN(value)) {
-      return "nan";
-    }
     return type.toLowerCase();
   }
 
